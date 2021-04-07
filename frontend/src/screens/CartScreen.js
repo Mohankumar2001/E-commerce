@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { addToCart, removeFromCart } from "../actions/cartActions";
 
 function CartScreen(props) {
@@ -9,8 +10,8 @@ function CartScreen(props) {
     const productId = props.match.params.id;
     const qty = props.location.search? Number(props.location.search.split('=')[1]) : 1;
     const dispatch = useDispatch();
-    const removeFromCartHandler = (prouductId) => {
-        dispatch(removeFromCart(productId));
+    const removeFromCartHandler = (productid) => {
+        dispatch(removeFromCart(productid));
     }
     useEffect(() => {
         if(productId) {
@@ -29,21 +30,21 @@ function CartScreen(props) {
                 {
                     cartItems.length === 0 ? <div>Cart is empty</div> : 
                         cartItems.map( item =>
-                            <div>
-                                <img src={"../" + item.image} alt="product-image" />
+                            <div className="cart-List-Item">
+                                <div className="cart-image"><img src={"../" + item.image} alt="product-image" /></div>
+                                
                                 <div className="cart-name">
-                                    <div>{item.name}</div>
+                                    <div><Link to={"/product/" + item.product}>{item.name}</Link></div>
                                     <div>
                                         Qty:
-                                        <select>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
+                                        <select value={item.qty} onChange={(e) => dispatch(addToCart(item.product, e.target.value))}>
+                                            {[...Array(item.countInStock).keys()].map(x => 
+                                                <option key={x + 1} value={x + 1}>{x + 1}</option>)}
                                         </select>
                                         <button type="button" className="button" onClick={() => removeFromCartHandler(item.product)}>delete</button>
                                     </div>
                                 </div>
-                                <div>{item.price}</div>
+                                <div className="cart-price">${item.price}</div>
                             </div>
                         )
                 }
