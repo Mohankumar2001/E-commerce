@@ -2,17 +2,28 @@ import React from 'react';
 // import data from './data';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import './App.css';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { signout } from './actions/userActions';
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
 import SigninScreen from './screens/SigninScreen';
-import { useSelector } from 'react-redux';
 import RegisterScreen from './screens/RegisterScreen';
+import ProductsScreen from './screens/ProductsScreen';
+import ShippingScreen from './screens/ShippingScreen';
+import PaymentScreen from './screens/PaymentScreen';
+import PlaceOrderScreen from './screens/PlaceOrderScreen';
 
 function App() {
-
+  const cart = useSelector((state) => state.cart)
+  const {cartItems} = cart;
   const userSignin = useSelector(state => state.userSignin);
   const {userInfo} = userSignin;
+  const dispatch = useDispatch();
+  const signoutHandler = () => {
+    dispatch(signout());
+  }
 
   const openMenu = () => {
     document.querySelector(".sidebar").classList.add("open");
@@ -24,7 +35,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="grid-container">
-          <header className="header">
+          <header className="header row">
               <div className="brand">
                   <button onClick={openMenu}>
                       &#9776;
@@ -33,8 +44,18 @@ function App() {
                   {/* <a href="index.html"> NITT E Shop </a> */}
               </div>
               <div className="header-links">
-                  <div><Link to="/cart"> &#x1F6D2; </Link></div>
-                  { userInfo ? <div><Link to="/profile"> {userInfo.name} </Link><Link to="/profile"> Log out </Link></div>
+                  <div>
+                  {cartItems.length > 0 && (
+                <span className="badge">{cartItems.length}</span>
+              )}
+                    <Link className="cart-symbol" to="/cart"> &#x1F6D2; 
+                   </Link></div>
+                  { userInfo ? <div className="dropdown"><Link to="/profile"> {userInfo.name} </Link>{' '}
+                    <ul className="dropdown-content">
+                    <Link to="/" onClick={signoutHandler}>Log out</Link>
+
+                    </ul>
+                    </div>
                   : <div><Link to="/signin"> sign in </Link></div>}
                   
               </div>
@@ -49,12 +70,15 @@ function App() {
           </aside>
           <main className="main">
               <div className="content">
+                <Route path="/products" component={ ProductsScreen } />
+                <Route path="/shipping" component={ ShippingScreen } />
+                <Route path="/payment" component={ PaymentScreen } />
+                <Route path="/placeorder" component={ PlaceOrderScreen } />
                 <Route path="/signin" component={ SigninScreen } />
                 <Route path="/register" component={ RegisterScreen } />
                 <Route path="/product/:id" component={ ProductScreen } />
                 <Route path="/cart/:id?" component={ CartScreen } />
                 <Route path="/" exact={true} component={ HomeScreen } />
-                  
               </div>
           </main>
           <footer className="footer">

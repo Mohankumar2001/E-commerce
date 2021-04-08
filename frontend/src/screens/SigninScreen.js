@@ -12,10 +12,11 @@ function SigninScreen(props) {
     const userSignin = useSelector(state=>state.userSignin);
     const { loading, userInfo, error } = userSignin;
     const dispatch = useDispatch();
+    const redirect = props.location.search?props.location.search.split("=")[1]:'/';
 
     useEffect(() => {
         if(userInfo) {
-            props.history.push("/");
+            props.history.push(redirect);
         }
         return () => {
             //
@@ -45,7 +46,7 @@ function SigninScreen(props) {
                 </li>
                 <li><button type="submit" className="button">Sign In</button></li>
                 <li>New to NITTEShop?</li>
-                <li><Link to="/register" className="button">Sign up</Link></li>
+                <li><Link to={redirect === "/"? "register":"register?redirect="+redirect} className="button">Sign up</Link></li>
             </ul>
         </form>
     </div>

@@ -13,11 +13,15 @@ function CartScreen(props) {
     const removeFromCartHandler = (productid) => {
         dispatch(removeFromCart(productid));
     }
+    const checkoutHandler = () => {
+        props.history.push('../shipping');
+    }
     useEffect(() => {
         if(productId) {
             dispatch(addToCart(productId, qty));
         }
     }, []);
+    
 
     return <div className="cart">
         <div className="cart-list">
@@ -31,7 +35,7 @@ function CartScreen(props) {
                     cartItems.length === 0 ? <div>Cart is empty</div> : 
                         cartItems.map( item =>
                             <div className="cart-List-Item">
-                                <div className="cart-image"><img src={"../" + item.image} alt="product-image" /></div>
+                                <div className="cart-image"><img src={item.image} alt="product-image" /></div>
                                 
                                 <div className="cart-name">
                                     <div><Link to={"/product/" + item.product}>{item.name}</Link></div>
@@ -56,7 +60,7 @@ function CartScreen(props) {
                 Subtotal ( {cartItems.reduce((a, c) => a + c.qty, 0)} items)
                 : $ {cartItems.reduce((a, c) => a + c.price * c.qty, 0)}
             </h3>
-            <button className="button primary" disabled={cartItems.length === 0}>Proceed to Checkout</button>
+            <button className="button primary" onClick={checkoutHandler} disabled={cartItems.length === 0}>Proceed to Checkout</button>
 
         </div>
         </div>

@@ -14,10 +14,11 @@ function RegisterScreen(props) {
     const userRegister = useSelector(state=>state.userRegister);
     const { loading, userInfo, error } = userRegister;
     const dispatch = useDispatch();
+    const redirect = props.location.search?props.location.search.split("=")[1]:'/';
 
     useEffect(() => {
         if(userInfo) {
-            props.history.push("/signin");
+            props.history.push(redirect);
         }
         return () => {
             //
@@ -60,7 +61,7 @@ function RegisterScreen(props) {
                     <input type="password" name="confirmPassword" id="confirmPassword" onChange={(e) => setConfirmPassword(e.target.value)}></input>
                 </li>
                 <li><button type="submit" className="button">Sign Up</button></li>
-                <li>Already have an account?<Link to="/signin" className="button">Sign In</Link></li>
+                <li>Already have an account?<Link to={redirect === "/"? "signin":"signin?redirect="+redirect} className="button">Sign In</Link></li>
             </ul>
         </form>
     </div>
