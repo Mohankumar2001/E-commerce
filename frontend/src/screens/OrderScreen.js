@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { addToCart, removeFromCart } from "../actions/cartActions";
-import { createOrder, detailsOrder } from "../actions/orderActions";
+import { createOrder, detailsOrder, payOrder } from "../actions/orderActions";
 import CheckoutSteps from "../components/CheckoutSteps";
-import { ORDER_CREATE_RESET } from "../constants/orderConstants";
+import { ORDER_CREATE_RESET, ORDER_PAY_RESET } from "../constants/orderConstants";
 import {PayPalButton} from 'react-paypal-button-v2';
 
 function OrderScreen(props) {
@@ -14,6 +14,8 @@ function OrderScreen(props) {
     const [sdkReady, setSdkReady] = useState(false);
     const orderDetails = useSelector((state) => state.orderDetails);
     const { order, loading, error } = orderDetails;
+    const orderPay = useSelector((state) => state.orderDetails);
+    const { loading: loadingPay, error: errorPay, success: successPay} = orderPay;
     const dispatch = useDispatch();
     useEffect(() => {
         const addPayPalScript = async () => {
@@ -27,7 +29,8 @@ function OrderScreen(props) {
             };
             document.body.appendChild(script);
         };
-        if(!order) {
+        if(!order || successPay || (order && order._id !== orderId)) {
+            dispatch({type: ORDER_PAY_RESET});
             dispatch(detailsOrder(orderId));
         } else {
             if (!order.isPaid) {
@@ -38,9 +41,12 @@ function OrderScreen(props) {
                 }
             }
         }
-    }, [dispatch, order, orderId, sdkReady]);
+    }, [dispatch, order, orderId, sdkReady, successPay]);
 
-    const successPaymentHandler = () => {};
+    const successPaymentHandler = (paymentResult) => {
+        dispatch(payOrder(order, paymentResult))
+    };
+
     return loading ? <div>Loading....</div> : error ? <div>{error}</div>
     : <div>
             <h1>Order: {order._id}</h1>
@@ -52,7 +58,7 @@ function OrderScreen(props) {
             </div>
             <div><div><h3>Payment</h3></div>
             <div>Payment Method: {order.paymentMethod}</div>
-                {order.isPaid?<div>Paid...</div>:<div>Not Paid...</div>}
+                {order.isPaid?<div>Paid at {order.paidAt}</div>:<div>Not Paid...</div>}
             </div>
             <div>
             <ul className="cart-list-container">
@@ -93,7 +99,12 @@ function OrderScreen(props) {
                     !order.isPaid && (
                         <li>
                             {!sdkReady? (<div>Loading...</div>):
-                                (<PayPalButton className="paypalButton" amount={order.totalPrice} onSuccess={successPaymentHandler}></PayPalButton>)
+                                (
+                                <>{errorPay && <div>{errorPay}</div>}{loadingPay && <div>Loading...</div>}
+                                <PayPalButton className="paypalButton" amount={order.totalPrice} onSuccess={successPaymentHandler}>
+                                    </PayPalButton>
+                                    </>
+                                    )
                             }
                         </li>
                     )

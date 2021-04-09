@@ -1,5 +1,7 @@
 import axios from "axios";
-import { ORDER_CREATE_FAIL, ORDER_CREATE_REQUEST, ORDER_CREATE_SUCCESS, ORDER_DETAILS_REQUEST, ORDER_DETAILS_FAIL, ORDER_DETAILS_SUCCESS } from "../constants/orderConstants";
+import { ORDER_CREATE_FAIL, ORDER_CREATE_REQUEST, ORDER_CREATE_SUCCESS, 
+    ORDER_DETAILS_REQUEST, ORDER_DETAILS_FAIL, ORDER_DETAILS_SUCCESS, 
+    ORDER_PAY_REQUEST, ORDER_PAY_SUCCESS, ORDER_PAY_FAIL } from "../constants/orderConstants";
 import { CART_EMPTY } from "../constants/cartConstants";
 
 export const createOrder = (order) => async (dispatch, getState) => {
@@ -36,3 +38,19 @@ export const detailsOrder = (orderId) => async (dispatch, getState) => {
         });
     }
 };
+
+export const payOrder = (order, paymentResult) => async (dispatch, getState) => {
+    dispatch({ type: ORDER_PAY_REQUEST, payload: { order, paymentResult }});
+    const { userSignin: {userInfo}} = getState();
+    try {
+        const {data} = await axios.put(`/api/orders/${order._id}/pay`, paymentResult, {
+            headers: { Authorization: 'Bearer ' + userInfo.token },
+        });
+        dispatch({ type: ORDER_PAY_SUCCESS, payload: data});
+    } catch (error) {
+        dispatch({
+            type: ORDER_PAY_FAIL, 
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message,
+        });
+    }
+}
