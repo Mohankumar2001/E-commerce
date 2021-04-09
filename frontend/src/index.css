@@ -494,3 +494,7 @@ tbody>tr:nth-child(odd) {
   padding: 1rem;
   margin: 1rem;
 }
+
+.paypalButton {
+  width: 100%;
+}

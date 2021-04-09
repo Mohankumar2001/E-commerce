@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { addToCart, removeFromCart } from "../actions/cartActions";
+import { createOrder } from "../actions/orderActions";
 import CheckoutSteps from "../components/CheckoutSteps";
+import { ORDER_CREATE_RESET } from "../constants/orderConstants";
 
 function PlaceOrderScreen(props) {
 
@@ -13,16 +15,23 @@ function PlaceOrderScreen(props) {
     } else if(!payment) {
         props.history.push("/payment");
     }
-    const itemsPrice = cartItems.reduce((a, c) => a + c.price * c.qty, 0);
-    const shippingPrice = itemsPrice > 50? 1 : 12;
-    const taxPrice = 0.13 * itemsPrice;
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
-
-    const placeOrderHandler = () => {}
-
+    cart.itemsPrice = cartItems.reduce((a, c) => a + c.price * c.qty, 0);
+    cart.shippingPrice = cart.itemsPrice > 50? 1 : 12;
+    cart.taxPrice = 0.13 * cart.itemsPrice;
+    cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
+    const orderCreate = useSelector((state) => state.orderCreate);
+    const { order, loading, error, success } = orderCreate;
     const dispatch = useDispatch();
+    const placeOrderHandler = () => {
+        dispatch(createOrder({ ...cart, orderItems: cart.cartItems }));
+    };
+
     useEffect(() => {
-    }, []);
+        if (success) {
+            props.history.push(`/order/${order._id}`);
+            dispatch({type: ORDER_CREATE_RESET})
+        }
+    }, [dispatch, order, props.history, success]);
 
     return <div>
         <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
@@ -31,7 +40,7 @@ function PlaceOrderScreen(props) {
             <div><div><h3>Shipping</h3></div>
             <div>{cart.shipping.address}, {cart.shipping.city}, {cart.shipping.postalCode}, {cart.shipping.country}</div></div>
             <div><div><h3>Payment</h3></div>
-            <div>Payment Method: {cart.payment.paymentMethod}</div></div>
+            <div>Payment Method: {cart.payment}</div></div>
             <div>
             <ul className="cart-list-container">
                 <li>
@@ -64,10 +73,12 @@ function PlaceOrderScreen(props) {
             <ul>
                 <li><button className="button primary" onClick={placeOrderHandler}>Place Order</button></li>
                 <li><h3>Order Summary</h3></li>
-                <li><div>Items:</div><div>${itemsPrice}</div></li>
-                <li><div>Shipping:</div><div>${shippingPrice}</div></li>
-                <li><div>Tax:</div><div>${taxPrice}</div></li>
-                <li><div>Total:</div><div>${totalPrice}</div></li>
+                <li><div>Items:</div><div>${cart.itemsPrice}</div></li>
+                <li><div>Shipping:</div><div>${cart.shippingPrice}</div></li>
+                <li><div>Tax:</div><div>${cart.taxPrice.toFixed(2)}</div></li>
+                <li><div>Total:</div><div>${cart.totalPrice}</div></li>
+                {loading && <div>Loading...</div>}
+                {error && <div>error...</div>}
             </ul>
 
         </div>

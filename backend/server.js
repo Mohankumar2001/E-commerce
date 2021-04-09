@@ -5,6 +5,7 @@ import config from './config';
 import mongoose from 'mongoose';
 import userRoute from './routes/userRoute';
 import productRoute from './routes/productRoute';
+import orderRoute from './routes/orderRoute';
 import bodyParser from 'body-parser';
 
 dotenv.config();
@@ -21,6 +22,10 @@ app.use(bodyParser.json());
 
 app.use("/api/users", userRoute);
 app.use("/api/products", productRoute);
+app.use("/api/orders", orderRoute);
+app.use("/api/config/paypal", (req, res) => {
+    res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
+});
 
 // app.get('/api/products/:id', (req, res) => {
 //     const productId = req.params.id;

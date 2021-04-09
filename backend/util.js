@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import config from "./config";
+// import dotenv from 'dotenv';
 
 const getToken = (user) => {
     return jwt.sign({
@@ -14,19 +15,24 @@ const getToken = (user) => {
 }
 
 const isAuth = (req, res, next) => {
+    console.log('step3');
+    console.log(req);
     const token = req.headers.authorization;
     if(token) {
         const onlyToken = token.slice(7, token.length);
-        jwt.verify(onlyToken, config.JWT_SECRET, (err, decode) => {
+        jwt.verify(onlyToken, config.JWT_SECRET || 'MySuperSecretPassword', (err, decode) => {
             if (err) {
-                return res.status(404).send({msg: 'Invalid Token'});
+                return res.status(401).send({message: 'Invalid Token'});
+            } else {
+                req.user = decode;
+                next();
+
             }
-            req.user = token;
-            next();
-            return;
         });
     }
-    return res.status(401).send({msg: 'Token is not supplied'});
+    else {
+        res.status(401).send({message: 'Token is not at all supplied'}); 
+    }
 }
 
 const isAdmin = (req, res, next) => {
