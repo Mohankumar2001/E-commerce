@@ -20,7 +20,7 @@ function CartScreen(props) {
         if(productId) {
             dispatch(addToCart(productId, qty));
         }
-    }, []);
+    }, [dispatch, productId, qty]);
     
 
     return <div className="cart">
@@ -35,7 +35,7 @@ function CartScreen(props) {
                     cartItems.length === 0 ? <div>Cart is empty</div> : 
                         cartItems.map( item =>
                             <div className="cart-List-Item">
-                                <div className="cart-image"><img src={item.image} alt="product-image" /></div>
+                                <div className="cart-image"><img src={item.image} /></div>
                                 
                                 <div className="cart-name">
                                     <div><Link to={"/product/" + item.product}>{item.name}</Link></div>

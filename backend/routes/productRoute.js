@@ -1,6 +1,6 @@
 import express from 'express';
-import Product from '../models/productModel';
-import { getToken } from '../util';
+import Product from '../models/productModel.js';
+import { getToken } from '../util.js';
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
-import express, { response } from 'express';
-import Order from '../models/orderModel';
-import { isAuth } from '../util';
+import express from 'express';
+import Order from '../models/orderModel.js';
+import { isAuth } from '../util.js';
 const orderRouter = express.Router();
 
 orderRouter.get('/mine', isAuth, async (req, res) => {
