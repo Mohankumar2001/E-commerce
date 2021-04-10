@@ -67,4 +67,16 @@ router.get("/createadmin", async (req, res) => {
     }
 })
 
+router.get('/:id', async (req, res) => {
+    console.log("user detail route..");
+    const user = await User.findById(req.params.id);
+    console.log("user detail got..", user.isAdmin);
+    if(user) {
+        console.log("user details being sent");
+        res.send({data: user});
+    } else {
+        res.status(404).send("User Not found");
+    }
+})
+
 export default router;

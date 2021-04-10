@@ -15,6 +15,8 @@ import ShippingScreen from './screens/ShippingScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
+import OrderHistoryScreen from './screens/OrderHistoryScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 function App() {
   const cart = useSelector((state) => state.cart)
@@ -51,9 +53,11 @@ function App() {
               )}
                     <Link className="cart-symbol" to="/cart"> &#x1F6D2; 
                    </Link></div>
-                  { userInfo ? <div className="dropdown"><Link to="/profile"> {userInfo.name} </Link>{' '}
+                  { userInfo ? <div className="dropdown"><Link to="#"> {userInfo.name} </Link>{' '}
                     <ul className="dropdown-content">
-                    <Link to="/" onClick={signoutHandler}>Log out</Link>
+                    <li> <Link to="/profile">Profile</Link></li> 
+                    <li> <Link to="/orderhistory">Orders</Link></li> 
+                    <li><Link to="/" onClick={signoutHandler}>Log out</Link></li>
 
                     </ul>
                     </div>
@@ -76,7 +80,9 @@ function App() {
                 <Route path="/payment" component={ PaymentScreen } />
                 <Route path="/placeorder" component={ PlaceOrderScreen } />
                 <Route path="/signin" component={ SigninScreen } />
+                <Route path="/profile" component={ ProfileScreen } />
                 <Route path="/register" component={ RegisterScreen } />
+                <Route path="/orderhistory" component={ OrderHistoryScreen } />
                 <Route path="/order/:id" component={ OrderScreen } />
                 <Route path="/product/:id" component={ ProductScreen } />
                 <Route path="/cart/:id?" component={ CartScreen } />
